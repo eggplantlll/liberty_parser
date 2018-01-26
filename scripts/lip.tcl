@@ -1,17 +1,232 @@
 package provide lip 1.0
 
+# lip_print_value_table
+# {{{
+proc lip_print_value_table {values xsize ysize} {
+  upvar kout kout
+  puts $kout "          values\( \\"
+  for {set y 0} {$y < $ysize} {incr y} {
+    set index [list]
+    set row   [list]
+    for {set x 0} {$x < $xsize} {incr x} {
+      set index [expr $y*$xsize+$x]
+      lappend row [lindex $values $index]
+    }
+    set new_row_str [join $row ", "]
+    puts $kout "          \"$new_row_str\", \\"
+  }
+  puts $kout "         \);"
+}
+# }}}
+# lip_interpolate
+proc lip_interpolate {glib cellname {ofile NA}} {
+  set gcell [get_cell $glib $cellname]
+  set cell_name [get_group_name $gcell]
+  upvar kout kout
+  puts $kout "  cell($cell_name) \{"
+  list_attributes $gcell {    } save
+
+# Pin level
+  foreach g2 [get_subgroups $gcell] {
+    set g2_name [get_group_name $g2]
+    if {$g2_name == "NA"} {set g2_name ""}
+    set g2_type [get_group_type $g2]
+    puts $kout "    $g2_type\($g2_name\) \{"
+
+    # Pin level attribute
+    foreach att [get_attributes $g2] {
+      set value [get_attribute_value $g2 $att]
+      if {$att == "capacitance"} {
+# Input pin cap * 2
+        #set value [expr $value * 2]
+        set value $value
+        puts $kout "      $att : \"$value\";"
+      } elseif {$att == "rise_capacitance_range" || $att == "fall_capacitance_range"} {
+        puts $kout "      [append att "\($value\);"]"
+      } else {
+        puts $kout "      $att : \"$value\";"
+      }
+    }
+# Timing level
+      foreach g3 [get_subgroups $g2] {
+        set g3_name [get_group_name $g3]
+        if {$g3_name == "NA"} {set g3_name ""}
+        set g3_type [get_group_type $g3]
+        puts $kout "      $g3_type\($g3_name\) \{"
+        list_attributes $g3 {        } save
+            # cell_rise, rise_power...
+            foreach g4 [get_subgroups $g3] {
+                set g4_name [get_group_name $g4]
+                set g4_type [get_group_type $g4]
+                # cell_rise, cell_fall
+                if {$g4_type == "cell_rise" || $g4_type == "cell_fall"} {
+                  set ysize [llength [get_attribute_value $g4 index_1]]
+                  set xsize [llength [get_attribute_value $g4 index_2]]
+                  puts $kout "        $g4_type\($g4_name\) \{"
+                  # index_1, index_2, values
+                  foreach att [get_attributes $g4] {
+                    if {$att == "values"} {
+                      set value [get_attribute_value $g4 $att]
+                      set intrinsic [lindex $value 0]
+                      regsub {,} $intrinsic {} intrinsic
+
+                      set newvalues [list]
+                      foreach v $value {
+                        regsub {,} $v {} v
+                        #lappend newvalues [format "%.6f" [expr ($v - $intrinsic)/2 + $intrinsic]]
+                        lappend newvalues $v
+                      }
+                      lip_print_value_table $newvalues $xsize $ysize
+                    # index_1, index_2
+                    } else {
+                      set value [get_attribute_value $g4 $att]
+                      puts $kout "          [append att "\(\"$value\"\);"]"
+                    }
+                  }
+                  puts $kout "        \}"
+                # rise_power, fall_power....
+                } else {
+                  set ysize [llength [get_attribute_value $g4 index_1]]
+                  set xsize [llength [get_attribute_value $g4 index_2]]
+                  #puts "ysize: $ysize, xsize: $xsize"
+                  puts $kout "        $g4_type\($g4_name\) \{"
+                  # index_1, index_2, values
+                  foreach att [get_attributes $g4] {
+                    # value
+                    if {$att == "values"} {
+                      set values [get_attribute_value $g4 $att]
+                      regsub -all {,} $values {} values
+                      if {$xsize == "1"} {
+                        puts $kout "          [append att "\(\"$values\"\);"]"
+                      } else {
+                        lip_print_value_table $values $xsize $ysize
+                      }
+                    # index_1, index_2
+                    } else {
+                      set values [get_attribute_value $g4 $att]
+                      puts $kout "          [append att "\(\"$values\"\);"]"
+                    }
+                  }
+                  puts $kout "        \}"
+                }
+            } ;#4
+            puts $kout "      \}"
+      }; #3
+      puts $kout "    \}"
+  }; #2
+  puts $kout "  \}"
+}
+
+proc file_not_exist_exit {fname} {
+  if ![file exist $fname] {
+    puts "Error: $fname not exist. Nothing done..."
+    exit
+  }
+}
+# lip_extract_cell
+# {{{
+proc lip_extract_cell {glib cellname {ofile NA}} {
+  set gcell [get_cell $glib $cellname]
+  set cell_name [get_group_name $gcell]
+  if {$ofile == "NA"} {
+    puts "  cell($cell_name) \{"
+    list_attributes $gcell {    }
+  } else {
+    upvar kout kout
+    puts $kout "  cell($cell_name) \{"
+    list_attributes $gcell {    } save
+  }
+
+  foreach g2 [get_subgroups $gcell] {
+    # name
+    if {[get_group_name $g2] == "NA"} {
+      set g2_name ""
+    } else {
+      set g2_name [get_group_name $g2]
+    }
+    # type
+    set g2_type [get_group_type $g2]
+    if {$ofile == "NA"} {
+      puts "    $g2_type\($g2_name\) \{"
+      list_attributes $g2 {      }
+    } else {
+      puts $kout "    $g2_type\($g2_name\) \{"
+      list_attributes $g2 {      } save
+    }
+
+      foreach g3 [get_subgroups $g2] {
+        # name
+        if {[get_group_name $g3] == "NA"} {
+          set g3_name ""
+        } else {
+          set g3_name [get_group_name $g3]
+        }
+        # type
+        set g3_type [get_group_type $g3]
+        if {$ofile == "NA"} {
+          puts "      $g3_type\($g3_name\) \{"
+          list_attributes $g3 {        }
+        } else {
+          puts $kout "      $g3_type\($g3_name\) \{"
+          list_attributes $g3 {        } save
+        }
+          foreach g4 [get_subgroups $g3] {
+            # name
+            if {[get_group_name $g4] == "NA"} {
+              set g4_name ""
+            } else {
+              set g4_name [get_group_name $g4]
+            }
+            # type
+            set g4_type [get_group_type $g4]
+            if {$ofile == "NA"} {
+              puts "        $g4_type\($g4_name\) \{"
+              list_attributes $g4 {          }
+            } else {
+              puts $kout "        $g4_type\($g4_name\) \{"
+              list_attributes $g4 {          } save
+            }
+            if {$ofile == "NA"} {
+              puts "        \}"
+            } else {
+              puts $kout "        \}"
+            }
+          } ;#4
+        if {$ofile == "NA"} {
+          puts "      \}"
+        } else {
+          puts $kout "      \}"
+        }
+      };#3
+    if {$ofile == "NA"} {
+      puts "    \}"
+    } else {
+      puts $kout "    \}"
+    }
+  }
+  if {$ofile == "NA"} {
+    puts "  \}"
+  } else {
+    puts $kout "  \}"
+  }
+}
+# }}}
+# get_cell_list
+# {{{
 proc get_cell_list {glib {pattern .*}} {
   foreach i [get_cells $glib $pattern] {
     lappend ilist [get_group_name $i]
   }
   return $ilist
 }
+# }}}
 # lip_get_cell_delay
 # {{{
 proc lip_get_cell_delay {glib cell_name tran load {ofile NA}} {
   upvar debug_mode debug_mode
   if ![info exist debug_mode] {set debug_mode 0}
-  if {$ofile != "NA"} {set kout [open $ofile w]}
+  #if {$ofile != "NA"} {set kout [open $ofile w]}
+  if {$ofile != "NA"} {upvar kout kout}
 
   set gcell [get_cell $glib $cell_name]
   set area [get_attribute_value $gcell area]
@@ -37,7 +252,7 @@ proc lip_get_cell_delay {glib cell_name tran load {ofile NA}} {
     }
   }
 
-  if {$ofile != "NA"} {close $kout}
+  #if {$ofile != "NA"} {close $kout}
 }
 # }}}
 # lip_list_all
@@ -70,7 +285,7 @@ proc lip_list_all {glib} {
 # }}}
 # lip_list_index
 # {{{
-proc lip_list_index {glib {ofile NA}} {
+proc lip_list_index {glib index_type {ofile NA}} {
   if {$ofile != "NA"} { set kout [open $ofile w]}
 
   # cell
@@ -106,14 +321,20 @@ proc lip_list_index {glib {ofile NA}} {
                 #list_attributes $g4 {                }
                 set index1 [get_attribute_value $g4 index_1]
                 set index2 [get_attribute_value $g4 index_2]
-                set values [get_attribute_value $g4 values]
+                #set values [get_attribute_value $g4 values]
                 if {$ofile == "NA"} {
-                  puts "$cell_name: $pin_name: $g4_type :  tran: $index1"
-                  puts "$cell_name: $pin_name: $g4_type :  load: $index2"
+                  if {$index_type == "tran"} {
+                    puts "$cell_name: $pin_name: $g4_type :  tran: $index1"
+                  } else {
+                    puts "$cell_name: $pin_name: $g4_type :  load: $index2"
+                  }
                   #puts "$cell_name: $pin_name: $g4_type : delay: $values"
                 } else {
-                  puts $kout "$cell_name: $pin_name: $g4_type :  tran: $index1"
-                  puts $kout "$cell_name: $pin_name: $g4_type :  load: $index2"
+                  if {$index_type == "tran"} {
+                    puts $kout "$cell_name: $pin_name: $g4_type :  tran: $index1"
+                  } else {
+                    puts $kout "$cell_name: $pin_name: $g4_type :  load: $index2"
+                  }
                   #puts $kout "$cell_name: $pin_name: $g4_type : delay: $values"
                 }
                 set break_g3   1
@@ -487,17 +708,19 @@ proc get_attr_table_value_1D {gp name} {
   return $1Dlist
 }
 # }}}
-# list_attributes
+# get_attributes
 # {{{
-proc list_attributes {gp {indent ""}} {
-  set e [new_err]
-  set attrs [si2drGroupGetAttrs $gp $e]
-  set vtype [new_vtype]
-  set intgr [new_int32]
+proc get_attributes {gp} {
+  set e       [new_err]
+  set attrs   [si2drGroupGetAttrs $gp $e]
+  set vtype   [new_vtype]
+  set intgr   [new_int32]
   set float64 [new_float64]
-  set string [new_string]
-  set bool [new_boolean]
-  set exp [new_expr]
+  set string  [new_string]
+  set bool    [new_boolean]
+  set exp     [new_expr]
+
+  set attrlist [list]
 
   while {1} {
     set attr [si2drIterNextAttr $attrs $e]
@@ -506,41 +729,81 @@ proc list_attributes {gp {indent ""}} {
       break;
     } else {
       set attr_name [si2drAttrGetName $attr $e]
-      puts -nonewline "$indent$attr_name : "
+      lappend attrlist $attr_name
+    }
+  }
+  si2drIterQuit $attrs $e;
+
+  return $attrlist
+}
+# }}}
+# list_attributes
+# {{{
+proc list_attributes {gp {indent ""} {ofile "NA"}} {
+  set e       [new_err]
+  set attrs   [si2drGroupGetAttrs $gp $e]
+  set vtype   [new_vtype]
+  set intgr   [new_int32]
+  set float64 [new_float64]
+  set string  [new_string]
+  set bool    [new_boolean]
+  set exp     [new_expr]
+
+  if {$ofile != "NA"} {
+    upvar kout kout
+  }
+
+  while {1} {
+    set attr [si2drIterNextAttr $attrs $e]
+    if {[si2drObjectIsNull $attr $e]} {
+      set v "NA"
+      break;
+    } else {
+      set attr_name [si2drAttrGetName $attr $e]
+      #puts -nonewline "$indent$attr_name : \""
       if {[si2drAttrGetAttrType $attr $e] == 0} {
         set value_type [si2drSimpleAttrGetValueType $attr $e]
         # SI2_STRING
-        if       {$value_type == 5} { puts [si2drSimpleAttrGetStringValue  $attr $e]
+        if       {$value_type == 5} { set value [si2drSimpleAttrGetStringValue  $attr $e]
         # SI2DR_FLOAT64
-        } elseif {$value_type == 4} { puts [si2drSimpleAttrGetFloat64Value $attr $e]
+        } elseif {$value_type == 4} { set value [si2drSimpleAttrGetFloat64Value $attr $e]
         # SI2DR_INT32
-        } elseif {$value_type == 2} { puts [si2drSimpleAttrGetInt32Value $attr $e]
+        } elseif {$value_type == 2} { set value [si2drSimpleAttrGetInt32Value $attr $e]
         # SI2DR_BOOLEAN
         } elseif {$value_type == 1} { set v [si2drSimpleAttrGetBooleanValue $attr $e]
-          if ($v) { puts "true" } else { puts "false" }
+          if ($v) { set value "true" } else { set value "false" }
         # SI2DR_EXPR
         } elseif {$value_type == 9} { puts "Need coding: EXPR type."}
+        if {$ofile == "NA"} {
+          puts "$indent$attr_name : \"$value\" ;"
+        } else {
+          puts $kout "$indent$attr_name : \"$value\" ;"
+        }
       } else {
         set vals [si2drComplexAttrGetValues $attr $e]
-        set value_list [list]
+        set value [list]
         while {1} {
           si2drIterNextComplexValue $vals $vtype $intgr $float64 $string $bool $exp $e
           set type_value [get_vtype_value $vtype]
           if {$type_value == 0} {
             break;
           } elseif {$type_value == 5} {
-            set value [get_string_value $string]
+            set avalue [get_string_value $string]
           } elseif {$type_value == 4} {
-            set value [get_float64_value $float64]
+            set avalue [get_float64_value $float64]
           } elseif {$type_value == 2} {
-            set value [get_int32_value $intgr]
+            set avalue [get_int32_value $intgr]
           } else {
             puts " $type_value: Working on it"
           }
-          lappend value_list  $value
+          lappend value $avalue
         }
-        set value_list [join $value_list ", "]
-        puts $value_list
+        set value [join $value ", "]
+        if {$ofile == "NA"} {
+          puts "$indent$attr_name\(\"$value\"\);"
+        } else {
+          puts $kout "$indent$attr_name\(\"$value\"\);"
+        }
       }
     }
   }
