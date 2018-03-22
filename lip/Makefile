@@ -24,19 +24,11 @@ all: 0 1 2 3
 3:
 	@t.tcl
 
-aa:
-	gcc a.c -o a
-
-create_pkg_index:
-	echo "pkg_mkIndex . lip.tcl lip.so" > tcmd
-	tclsh tcmd
-	#rm tcmd
 
 PACKAGE_PATH:=/home/chihkang/usr/local/lib
-TOOLS_PATH=/home/chihkang/bin/lip
-i:
-	mkdir -p ${PACKAGE_PATH}/lip
-	cp lip.tcl ${PACKAGE_PATH}/lip
-	cp lip.so ${PACKAGE_PATH}/lip
-	cp pkgIndex.tcl ${PACKAGE_PATH}/lip
-	cp tools/*.tcl ${TOOLS_PATH}
+install:
+	mkdir  -p           ${PACKAGE_PATH}/lip
+	cp     lip_init.tcl ${PACKAGE_PATH}/lip
+	cp     lip.tcl      ${PACKAGE_PATH}/lip
+	cp     lip.so       ${PACKAGE_PATH}/lip
+	cp     pkgIndex.tcl ${PACKAGE_PATH}/lip
