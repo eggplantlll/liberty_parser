@@ -1,0 +1,11 @@
+liberty_parse-2.6/*.o
+liberty_parse-2.6/*.lo
+liberty_parse-2.6/*.la
+liberty_parse-2.6/*.exe
+liberty_parse-2.6/*.log
+liberty_parse-2.6/*.status
+liberty_parse-2.6/*.deps
+liberty_parse-2.6/*.libs
+lip/*.o
+
+
