@@ -1,3 +1,4 @@
+liberty_parse-2.6/Makefile
 liberty_parse-2.6/*.o
 liberty_parse-2.6/*.lo
 liberty_parse-2.6/*.la
@@ -7,5 +8,11 @@ liberty_parse-2.6/*.status
 liberty_parse-2.6/*.deps
 liberty_parse-2.6/*.libs
 lip/*.o
+lip/*.so
+lip/lip_wrap.c
+liberty_parse-2.6/libtool
+liberty_parse-2.6/syntax_decls.c
+liberty_parse-2.6/syntax_decls.h
+
 
 
