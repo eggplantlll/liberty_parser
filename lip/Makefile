@@ -25,10 +25,10 @@ all: 0 1 2 3
 	@t.tcl
 
 
-PACKAGE_PATH:=/home/chihkang/usr/local/lib
+PREFIX:=${HOME}
 install:
-	mkdir  -p           ${PACKAGE_PATH}/lip
-	cp     lip_init.tcl ${PACKAGE_PATH}/lip
-	cp     lip.tcl      ${PACKAGE_PATH}/lip
-	cp     lip.so       ${PACKAGE_PATH}/lip
-	cp     pkgIndex.tcl ${PACKAGE_PATH}/lip
+	mkdir  -p           ${PREFIX}/usr/local/lib/lip
+	cp     lip_init.tcl ${PREFIX}/usr/local/lib/lip
+	cp     lip.tcl      ${PREFIX}/usr/local/lib/lip
+	cp     lip.so       ${PREFIX}/usr/local/lib/lip
+	cp     pkgIndex.tcl ${PREFIX}/usr/local/lib/lip

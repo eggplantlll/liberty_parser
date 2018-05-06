@@ -19,6 +19,7 @@ proc lip_print_value_table {values xsize ysize} {
 }
 # }}}
 # lip_interpolate
+# {{{
 proc lip_interpolate {glib cellname {ofile NA}} {
   set gcell [get_cell $glib $cellname]
   set cell_name [get_group_name $gcell]
@@ -116,13 +117,16 @@ proc lip_interpolate {glib cellname {ofile NA}} {
   }; #2
   puts $kout "  \}"
 }
-
+# }}}
+# file_not_exist_exit
+# {{{
 proc file_not_exist_exit {fname} {
   if ![file exist $fname] {
     puts "Error: $fname not exist. Nothing done..."
     exit
   }
 }
+# }}}
 # lip_extract_cell
 # {{{
 proc lip_extract_cell {glib cellname {ofile NA}} {
