@@ -32,3 +32,7 @@ install:
 	cp     lip.tcl      ${PREFIX}/usr/local/lib/lip
 	cp     lip.so       ${PREFIX}/usr/local/lib/lip
 	cp     pkgIndex.tcl ${PREFIX}/usr/local/lib/lip
+instools:
+	mkdir  -p           ${PREFIX}/usr/local/bin/lip
+	rm     -rf          ${PREFIX}/usr/local/bin/lip
+	cp     -r tools     ${PREFIX}/usr/local/bin/lip
