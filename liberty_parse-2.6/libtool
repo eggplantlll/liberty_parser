@@ -168,7 +168,7 @@ lock_old_archive_extraction=no
 LTCC="gcc"
 
 # LTCC compiler flags.
-LTCFLAGS="-ggdb -O2 -pipe -Wimplicit-function-declaration -fdebug-prefix-map=/usr/src/ports/libtool/libtool-2.4.6-5.x86_64/build=/usr/src/debug/libtool-2.4.6-5 -fdebug-prefix-map=/usr/src/ports/libtool/libtool-2.4.6-5.x86_64/src/libtool-2.4.6=/usr/src/debug/libtool-2.4.6-5"
+LTCFLAGS="-ggdb -O2 -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -fstack-protector-strong --param=ssp-buffer-size=4 -fdebug-prefix-map=/usr/src/ports/libtool/libtool-2.4.6-6.x86_64/build=/usr/src/debug/libtool-2.4.6-6 -fdebug-prefix-map=/usr/src/ports/libtool/libtool-2.4.6-6.x86_64/src/libtool-2.4.6=/usr/src/debug/libtool-2.4.6-6"
 
 # Take the output of nm and produce a listing of raw symbols and C names.
 global_symbol_pipe="sed -n -e 's/^.*[	 ]\\([ABCDGIRSTW][ABCDGIRSTW]*\\)[	 ][	 ]*\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 \\2 \\2/p' | sed '/ __gnu_lto/d'"
@@ -295,7 +295,7 @@ finish_eval=""
 hardcode_into_libs=no
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/usr/lib/gcc/x86_64-pc-cygwin/6.4.0 /usr/x86_64-pc-cygwin/lib /usr/lib /lib  /usr/lib/w32api"
+sys_lib_search_path_spec="/usr/lib/gcc/x86_64-pc-cygwin/7.3.0 /usr/x86_64-pc-cygwin/lib /usr/lib /lib  /usr/lib/w32api"
 
 # Detected run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/lib /usr/lib"
@@ -527,7 +527,7 @@ func_cc_basename ()
 # ### END FUNCTIONS SHARED WITH CONFIGURE
 
 #! /bin/sh
-## DO NOT EDIT - This file generated from /usr/src/ports/libtool/libtool-2.4.6-5.x86_64/src/libtool-2.4.6/build-aux/ltmain.in
+## DO NOT EDIT - This file generated from /usr/src/ports/libtool/libtool-2.4.6-6.x86_64/src/libtool-2.4.6/build-aux/ltmain.in
 ##               by inline-source v2014-01-03.01
 
 # libtool (GNU libtool) 2.4.6
@@ -11817,18 +11817,18 @@ file_list_spec=""
 hardcode_action=immediate
 
 # The directories searched by this compiler when creating a shared library.
-compiler_lib_search_dirs="/usr/lib/w32api /usr/lib/gcc/x86_64-pc-cygwin/6.4.0 /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../lib /lib/../lib /usr/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../.."
+compiler_lib_search_dirs="/usr/lib/gcc/x86_64-pc-cygwin/7.3.0 /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../lib /lib/../lib /usr/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../.."
 
 # Dependencies to place before and after the objects being linked to
 # create a shared library.
-predep_objects="/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/crtbeginS.o"
-postdep_objects="/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/crtend.o"
+predep_objects="/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/crtbeginS.o"
+postdep_objects="/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/crtend.o"
 predeps=""
 postdeps="-lstdc++ -lgcc_s -lgcc -lcygwin -ladvapi32 -lshell32 -luser32 -lkernel32 -lgcc_s -lgcc"
 
 # The library search path used internally by the compiler when linking
 # a shared library.
-compiler_lib_search_path="-L/usr/lib/w32api -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0 -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../.."
+compiler_lib_search_path="-L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0 -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../.."
 
 # ### END LIBTOOL TAG CONFIG: CXX
 
@@ -12127,18 +12127,18 @@ file_list_spec=""
 hardcode_action=immediate
 
 # The directories searched by this compiler when creating a shared library.
-compiler_lib_search_dirs="/usr/lib/w32api /usr/lib/gcc/x86_64-pc-cygwin/6.4.0 /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../lib /lib/../lib /usr/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib /usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../.."
+compiler_lib_search_dirs="/usr/lib/gcc/x86_64-pc-cygwin/7.3.0 /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../lib /lib/../lib /usr/lib/../lib /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib /usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../.."
 
 # Dependencies to place before and after the objects being linked to
 # create a shared library.
-predep_objects="/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/crtbeginS.o"
-postdep_objects="/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/crtend.o"
+predep_objects="/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/crtbeginS.o"
+postdep_objects="/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/crtend.o"
 predeps=""
 postdeps="-lgfortran -lgcc_s -lgcc -lquadmath -lm -lgcc_s -lgcc -lcygwin -ladvapi32 -lshell32 -luser32 -lkernel32 -lgcc_s -lgcc"
 
 # The library search path used internally by the compiler when linking
 # a shared library.
-compiler_lib_search_path="-L/usr/lib/w32api -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0 -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../../../x86_64-pc-cygwin/lib -L/usr/lib/gcc/x86_64-pc-cygwin/6.4.0/../../.."
+compiler_lib_search_path="-L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0 -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../../../x86_64-pc-cygwin/lib -L/usr/lib/gcc/x86_64-pc-cygwin/7.3.0/../../.."
 
 # ### END LIBTOOL TAG CONFIG: FC
 
