@@ -1,5 +1,77 @@
 package provide lip 1.0
 
+proc lib2verilog {libfile} {
+
+  set glib [read_lib $libfile]
+
+
+  set gcell [get_subgroup_of_type $glib cell]
+  set refname [get_group_name $gcell]
+
+  set pinlist ""
+  foreach pin [get_subgroups $gcell] {
+    set name      [get_group_name $pin]
+    set type      [get_group_type $pin]
+    set direction [get_attribute_value $pin direction]
+    #set is_analog [get_attribute_value $pin is_analog]
+    if {$type == "bus"} {
+      set pingroups [get_subgroups $pin]
+      set size [llength $pingroups]
+      if {$direction == "NA"} {
+        set direction [get_attribute_value [lindex $pingroups 1] direction]
+      }
+      #set direction [get_attribute_value [lindex $pingroups 1] is_analog]
+    } else {
+      set size 1
+    }
+    if {$type == "pin" || $type == "bus"} {
+      if {$direction == "internal"} {
+      } else {
+        #puts [format "%-45s %-5s %-7s %-2s" $name $type $direction $size]
+        lappend pinlist [list $name $direction]
+        set     pinattr($name,direction) $direction
+        set     pinattr($name,size)      $size
+      }
+    }
+  }
+
+  if {$pinlist == ""} {
+    puts "Error: No pins... $libfile"
+    return
+  }
+
+  set pinlist [lsort -index 1 $pinlist]
+
+  foreach pin $pinlist {
+    lappend pin_sorted [lindex $pin 0]
+  }
+
+  set kout [open $refname.v w]
+# module
+  puts $kout "module $refname ("
+
+    foreach pin $pin_sorted {
+      lappend pins $pin
+    }
+    puts $kout [join $pins ,]
+
+  puts $kout ");"
+# port
+    foreach pin $pin_sorted {
+      if {$pinattr($pin,size) > 1} {
+        set size [expr $pinattr($pin,size) -1]
+        puts $kout [format "    %-8s %-10s %s;" $pinattr($pin,direction) "\[$size:0\]" $pin]
+      } else {
+        puts $kout [format "    %-19s %s;" $pinattr($pin,direction) $pin]
+      }
+    }
+# endmodule
+  puts $kout "endmodule"
+  
+  close $kout
+
+}
+
 # lip_print_value_table
 # {{{
 proc lip_print_value_table {values xsize ysize} {
@@ -1532,4 +1604,7 @@ proc chk_pin {glib cell pin} {
   list_subgroups_its_attr $gpin
 }
 # }}}
+proc test_lip {} {
+  puts "Perfect! lip.tcl is loaded correctly."
+}
 # vim:ft=tcl fdm=marker
